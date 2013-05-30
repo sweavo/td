@@ -673,7 +673,7 @@ class Task(object):
         for d in undones:
             print d.format(TASK_TEXT_WIDTH, highlight=True, prefix=prefix )
             if d.expanded:
-                d.ls( prefix + d.get_id() + '/' )
+                d.ls( prefix + '    /' )
         for d in dones:
             print d.format(TASK_TEXT_WIDTH, highlight=False, prefix=prefix )
         if prefix is "":
