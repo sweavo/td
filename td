@@ -131,15 +131,27 @@ import datetime
 import locale
 import os
 import pickle
-import readline
+try:
+    import readline
+except ImportError:
+    readline=None
 import sys
 import time
 
-# For curses library
-locale.setlocale(locale.LC_ALL, '')
-code = locale.getpreferredencoding()
-
 import working_hours
+
+if not os.environ.has_key( 'OSTYPE' ):
+    # in msys/windows we don't see OSTYPE, and it doesn't support ansi.
+    # coincidence? probably. Better way of detecting ANSI support? Probably.
+    ANSI_RED = ""
+    ANSI_GREEN = ""
+    ANSI_BRIGHT = ""
+    ANSI_RESET = ""
+else:
+    ANSI_RED = "\033[[31;1m"
+    ANSI_GREEN = "\033[[32;1m"
+    ANSI_BRIGHT = "\033[[1m"
+    ANSI_RESET = "\033[[0m"
 
 VERBS={
     "add": ["TEXT"], 
@@ -444,6 +456,8 @@ class Task(object):
 
     def add(s, text):
         """ create and add a child task given its text """
+        if text.strip() == "":
+            return None
         return s.add_child( Task(s, text) )
 
     def add_child(s, t, id=None):
@@ -584,11 +598,11 @@ class Task(object):
                 ret += "   -.--"
             else:
                 if calcd_remain > (s.remain * 1.02): # effort overrun in red
-                    ret += "\033[[31;1m"
-                    tail = "\033[[0m"
+                    ret += ANSI_RED
+                    tail = ANSI_RESET
                 elif calcd_remain < (s.remain * 0.75): # effort underrun by 75% green
-                    ret += "\033[[32;1m"
-                    tail = "\033[[0m"
+                    ret += ANSI_GREEN
+                    tail = ANSI_RESET
                 ret += "% 7.2f" % s.remain
         else:
             ret += "   Done"
@@ -604,7 +618,7 @@ class Task(object):
             ret += " "
         
         if highlight:
-            ret = "\033[[1m%s\033[0m" % ret
+            ret = ANSI_BRIGHT + ret + ANSI_RESET
         return ret
 
     def get_child(s, key):
@@ -933,6 +947,8 @@ def execute_command( command_line ):
         execute_command( 'ls' )
         try:
             l = raw_input( PROMPT )
+            if l == '\04':
+                l = None
         except EOFError:
             l = None
         while l is not None:
@@ -940,6 +956,8 @@ def execute_command( command_line ):
                 success = execute_command( l.strip() ) and success
             try:
                 l = raw_input( PROMPT )
+                if l == '\04':
+                    l = None
             except EOFError:
                 l = None
         print "<EOF>"
@@ -1163,6 +1181,8 @@ if len(sys.argv) > 1 and sys.argv[1] == '-f':
         # good luck! We leave the error reporting to the code that tries to open the file.
         PICKLE_FILE = os.path.expanduser( os.path.join( PICKLE_PATH, ".pytask.pickle") )
 
+sys.stderr.write( "PICKLE_FILE = %s\n" % PICKLE_FILE )
+
 HISTORY_FILE = os.path.expanduser( PICKLE_PATH + "/.pytask.history" )
 
 # if we are not given a commandline, then go into interactive mode
@@ -1172,16 +1192,18 @@ else:
     command_line=' '.join(sys.argv[1:])
 
 # Set up readline in case we need it
-readline.set_completer( auto_complete )
-readline.parse_and_bind( "tab: complete" )
 try:
+    readline.set_completer( auto_complete )
+    readline.parse_and_bind( "tab: complete" )
     readline.read_history_file( HISTORY_FILE )
 except:
     pass
 
 # then execute it
 execute_command( command_line )
-readline.write_history_file( HISTORY_FILE )
-
+try:
+    readline.write_history_file( HISTORY_FILE )
+except:
+    pass
 # End of logic
 
