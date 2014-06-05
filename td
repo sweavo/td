@@ -123,8 +123,7 @@ Other Modes:
 
 """
 # All code must come after the docstring for __doc__ to work.
-VERSION_STRING="$Id: td 180 2013-05-29 23:48:15Z sweavo $"
-REVISION=VERSION_STRING.split()[2]
+GIT_DESCRIPTION="(development version)"
 
 from copy import copy
 import datetime
@@ -1132,7 +1131,8 @@ def execute_command( command_line ):
             success = False
         else:
             tgt.unexpand()
-
+    elif command == 'version':
+        print GIT_DESCRIPTION
     elif command == 'zoom':
         tgt = db.get( operand )
         if tgt is None:
