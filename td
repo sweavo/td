@@ -315,7 +315,7 @@ class TaskDatabase(object):
 
     def __init__(s):
         """ Initialize a new TaskDatabase containing the root task. """
-        s.root=Task( s, "0", "/ Task List" )
+        s.root=Task( s, "root", "/ Task List" )
         s.root.parent=s.root
         s.curdir=s.root
         # Dirstack is the stack of directories for pushd and popd.
@@ -686,7 +686,7 @@ class Task(object):
     def print_lineage( s, highlight=None ):
         if s.parent == s: # then I am root
             print banner()
-            print ("%s R%s %" + str(TASK_TEXT_WIDTH+7) +"s") % ( s.text, REVISION, "@"+CONTEXT )
+            print ("%s td %s") % ( s.text, GIT_DESCRIPTION )
             return ""
         else:
             dep = s.parent.print_lineage( highlight )
