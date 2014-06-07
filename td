@@ -238,23 +238,6 @@ def auto_complete( text, state ):
         else:
             return None
 
-class el(object):
-    """ An XML element for writing reports """
-    def __init__(s, tag, content=None ):
-        s.content = content
-        s.tag = tag
-    def __str__(s):
-        if s.content is None:
-            return "<%s/>" % s.tag
-        elif isinstance(s.content,list):
-            result = "<%s>" % s.tag
-            for c in s.content:
-                result+="\n" + str( c )
-            result +="\n</%s>" % s.tag
-        else:
-            result = "<%s>%s</%s>" % (s.tag, s.content, s.tag )
-        return result
-
 class TaskDatabase(object):
 
     def __init__(s):
@@ -263,7 +246,6 @@ class TaskDatabase(object):
         s.root.parent=s.root
         s.curdir=s.root
         # Dirstack is the stack of directories for pushd and popd.
-        # 
         s.dirstack=[]
         s.path=[]
 
