@@ -240,25 +240,25 @@ def auto_complete( text, state ):
 
 class TaskDatabase(object):
 
-    def __init__(s):
+    def __init__(self):
         """ Initialize a new TaskDatabase containing the root task. """
-        s.root=Task( s, "root", "/ Task List" )
-        s.root.parent=s.root
-        s.curdir=s.root
+        self.root=Task( self, "todo", "/ Task List" )
+        self.root.parent=self.root
+        self.curdir=self.root
         # Dirstack is the stack of directories for pushd and popd.
-        s.dirstack=[]
-        s.path=[]
+        self.dirstack=[]
+        self.path=[]
 
-    def add(s, text, path=None):
+    def add(self, text, path=None):
         """ Add a task to the current dir """
         if path is None:
             path = "."
-        return s.get(path).add( text )
+        return self.get(path).add( text )
 
-    def get(s, path, origin=None):
+    def get(self, path, origin=None):
         """ resolve a path and return the task found there. """
         if origin is None:
-            origin=s.curdir
+            origin=self.curdir
         if path == '':
             return origin
         else:
@@ -266,51 +266,51 @@ class TaskDatabase(object):
             head = plist[0]
             tail = '/'.join(plist[1:])
             if head=='': # path started with /
-                return s.get( tail, s.root )
+                return self.get( tail, self.root )
             elif head=='.':
-                return s.get( tail, origin )
+                return self.get( tail, origin )
             elif head=='..':
-                return s.get( tail, origin.parent )
+                return self.get( tail, origin.parent )
             elif origin.get_child( head ):
-                return s.get( tail, origin.get_child( head ) )
+                return self.get( tail, origin.get_child( head ) )
             else:
                 return None
 
-    def cd(s, path):
+    def cd(self, path):
         """ resolve path and change current directory to it. """
-        tgt = s.get( path )
+        tgt = self.get( path )
         if tgt is None:
             error ("Invalid Path")
             return False
         else:
-            s.curdir = tgt
+            self.curdir = tgt
             return True
 
-    def pds(s,option=None):
+    def pds(self,option=None):
         """ print the directory stack """
         ret = ''
-        l=len(s.dirstack)
-        for i,x in enumerate( s.dirstack ):
+        l=len(self.dirstack)
+        for i,x in enumerate( self.dirstack ):
             ret+="%d:%s "%(l-i,x.get_path())
             if option == '-v':
                 ret += x.text + "\n"
         print ret
 
-    def pushd(s, path):
+    def pushd(self, path):
         """ push directory onto stack and change """
-        olddir = s.curdir
-        if s.cd( path ):
-            s.dirstack.append( olddir )
-            s.pds()
+        olddir = self.curdir
+        if self.cd( path ):
+            self.dirstack.append( olddir )
+            self.pds()
 
-    def popd(s):
+    def popd(self):
         """ pop directory from stack """
-        if len(s.dirstack) == 0:
+        if len(self.dirstack) == 0:
             print "No more paths to pop."
         else:
-            s.cd( s.dirstack.pop().get_path() )
+            self.cd( self.dirstack.pop().get_path() )
 
-    def rotd(s, num=None):
+    def rotd(self, num=None):
         """ pushd and unqueue current dir from BOTTOM of stack 
         
             num is the index from the top of the stack or negative num is 
@@ -321,14 +321,14 @@ class TaskDatabase(object):
         elif num.isdigit():
             num = int(num)
             if num < 0:
-                num = len(s.dirstack) + num
+                num = len(self.dirstack) + num
         else:
-            num = len(s.dirstack)
+            num = len(self.dirstack)
         for x in range(0, num):
-            s.dirstack.insert( 0, s.curdir )
-            s.popd( )
+            self.dirstack.insert( 0, self.curdir )
+            self.popd( )
 
-    def swd(s, num):
+    def swd(self, num):
         """ switch directory (exchange current directory with the one on the
             top of the stack, or with one by index if specfied
         """
@@ -338,54 +338,54 @@ class TaskDatabase(object):
             num = int(num)
         else:
             num = 1
-        if len(s.dirstack) < num:
-            error ("Dir Stack has %d element(s)." % len(s.dirstack))
+        if len(self.dirstack) < num:
+            error ("Dir Stack has %d element(s)." % len(self.dirstack))
             return False
         else:
-            tmp = s.dirstack[-num]
-            s.dirstack[-num] = s.curdir
-            s.curdir=tmp
+            tmp = self.dirstack[-num]
+            self.dirstack[-num] = self.curdir
+            self.curdir=tmp
             return True
 
-    def ls(s, path='.' ):
+    def ls(self, path='.' ):
         """ resolve path and display the resulting task """
-        tgt = s.get( path )
+        tgt = self.get( path )
         if tgt is None:
             error ("Invalid Path")
         else:
             tgt.ls()
 
-    def dump(s):
+    def dump(self):
         print "td batch <<EOF"
         print "reset"
-        s.root.dump()
+        self.root.dump()
         print "EOF"
 
 class Task(object):
 
-    def __init__(s, parent, text, category=None, prio=1, due=None):
+    def __init__(self, parent, text, category=None, prio=1, due=None):
         """ initialize a new task under a parent """
-        s.parent = parent
+        self.parent = parent
         # We magic the ID. Our parent will check it and modify if necessary.
-        s.set_id( text )
-        s.text = text
-        s.prio = prio
-        s.due = due
-        s.done = None
-        s.children = []
-        s.remain = None
-        s.created = time.time()
-        s.deadline = None
-        s.defer = None
-        s.expanded = False
+        self.set_id( text )
+        self.text = text
+        self.prio = prio
+        self.due = due
+        self.done = None
+        self.children = []
+        self.remain = None
+        self.created = time.time()
+        self.deadline = None
+        self.defer = None
+        self.expanded = False
 
-    def add(s, text):
+    def add(self, text):
         """ create and add a child task given its text """
         if text.strip() == "":
             return None
-        return s.add_child( Task(s, text) )
+        return self.add_child( Task(self, text) )
 
-    def add_child(s, t, id=None):
+    def add_child(self, t, id=None):
         """ add an existing child task to a task, adjusting its ID if necessary """
         # Allow caller to suggest the ID
         if id is not None:
@@ -395,99 +395,99 @@ class Task(object):
         
         orig_id=t.get_id() # the desired ID
         count = 0
-        while s.get_child( t.get_id() ) is not None: # now disambiguate.
+        while self.get_child( t.get_id() ) is not None: # now disambiguate.
             count = count + 1
             sc = str(count)
             wid=len(sc)
             t.set_id( orig_id[:ID_WIDTH-wid] + sc )
         # the task's ID is unique amongst its new siblings. Move it.
-        s.children.append( t )
-        t.parent = s
+        self.children.append( t )
+        t.parent = self
         return t
 
-    def boost( s ):
+    def boost( self ):
         """ move self to start of parent's list of children """
-        s.parent.children = [s] + [ c for c in s.parent.children if c is not s ]
+        self.parent.children = [self] + [ c for c in self.parent.children if c is not self ]
 
-    def bump( s ):
+    def bump( self ):
         """ move self to end of parent's list of children """
-        s.parent.children = [ c for c in s.parent.children if c is not s ]
-        s.parent.children.append( s )
+        self.parent.children = [ c for c in self.parent.children if c is not self ]
+        self.parent.children.append( self )
 
-    def calc_deadline( s ):
+    def calc_deadline( self ):
         """ set deadline to date/time dt """
-        if s.deadline is None:
-            return s.parent.calc_deadline()
+        if self.deadline is None:
+            return self.parent.calc_deadline()
         else:
-            return s.deadline
+            return self.deadline
 
-    def calc_remain(s, override=True):
+    def calc_remain(self, override=True):
         """ return the remain calculated recursively. 
         
             override:   return the user-set remain if it's more than the
                         calculated remain. Default True 
         """
-        if s.done is not None:
+        if self.done is not None:
             return 0.0
         else:
             found = False
             total = 0.0
-            for c in s.children:
+            for c in self.children:
                 if c.done is None:
                     found = True
                     total += c.calc_remain()
             if found:
-                if s.remain is None or ((s.remain < total) or not override):
+                if self.remain is None or ((self.remain < total) or not override):
                     return total
                 else:
-                    return s.remain
+                    return self.remain
             else:
-                if s.remain is not None:
-                    return s.remain 
+                if self.remain is not None:
+                    return self.remain
                 else:
                     return DEFAULT_REMAIN
 
-    def count_tasks(s):
+    def count_tasks(self):
         """ return the number of live tasks this task represents """
-        if len(s.children)==0:
+        if len(self.children)==0:
             return 1
         else:
-            return sum( c.count_tasks() for c in s.children )
+            return sum( c.count_tasks() for c in self.children )
 
-    def dump(s, depth = None):
+    def dump(self, depth = None):
         """ recursive dump of the commands necessary to reproduce this task
             and all its descendents
         """
         INDENT = "  "
         if depth is None:
             depth = 0
-        print INDENT * depth + "# " + s.get_path()
-        if s.get_path() == '/':
-            print "ed / " + s.text
+        print INDENT * depth + "# " + self.get_path()
+        if self.get_path() == '/':
+            print "ed / " + self.text
         else:
-            print INDENT * depth + "adc %s" % s.text
+            print INDENT * depth + "adc %s" % self.text
             depth = depth + 1
-            print INDENT * depth + "ren . %s" % s.get_id()
-            if s.remain is not None:
-                print INDENT * depth + "remain %.2f" % s.remain
-        for c in s.children:
+            print INDENT * depth + "ren . %s" % self.get_id()
+            if self.remain is not None:
+                print INDENT * depth + "remain %.2f" % self.remain
+        for c in self.children:
             c.dump( depth )
-        if s.get_path() != '/':
-            if s.done is not None:
+        if self.get_path() != '/':
+            if self.done is not None:
                 print INDENT * depth + "done ."
             else:
                 print INDENT * depth + "cd .."
             depth -= 1
-            print INDENT * depth + "# End of %s. " % s.get_path()
+            print INDENT * depth + "# End of %s. " % self.get_path()
 
     def expand( self ):
         self.expanded = True
 
-    def expunge(s):
+    def expunge(self):
         """ remove all children marked as done """
-        s.children = [c for c in s.children if c.done is None]
+        self.children = [c for c in self.children if c.done is None]
 
-    def format(s, task_text_width=None, highlight=None, with_path=None, prefix=None):
+    def format(self, task_text_width=None, highlight=None, with_path=None, prefix=None):
         """ format this task on one line for output """
         if task_text_width is None:
             task_text_width=TASK_TEXT_WIDTH
@@ -496,48 +496,48 @@ class Task(object):
         if prefix is None:
             prefix = ''
 
-        if s.deadline is not None:
+        if self.deadline is not None:
             task_text_width -= 10 # width of "mm/dd XXX "
         if highlight is None:
             highlight=False
         ret =""
         if with_path:
-            ret += s.get_path()
-            task_text_width -= len(s.get_path())
-        if not s.match_id(s.text):
-            formatted_id = "%s: " % s.get_id()
+            ret += self.get_path()
+            task_text_width -= len(self.get_path())
+        if not self.match_id(self.text):
+            formatted_id = "%s: " % self.get_id()
             ret += formatted_id
             task_text_width -= len( formatted_id )
         ret = prefix + ret
         task_text_width -= len( prefix )
 
-        ret += ("%-" + str(task_text_width) + "s ") % s.text[:task_text_width]
+        ret += ("%-" + str(task_text_width) + "s ") % self.text[:task_text_width]
         
-        if s.deadline is not None:
-            ret += s.deadline.strftime( "%d/%m " ) + ("%03d " % working_hours.working_hours_till( s.deadline ) )
+        if self.deadline is not None:
+            ret += self.deadline.strftime( "%d/%m " ) + ("%03d " % working_hours.working_hours_till( self.deadline ) )
 
-        calcd_remain = s.calc_remain(False)
+        calcd_remain = self.calc_remain(False)
         tail = ''
-        if s.done is None:
-            if s.remain is None:
+        if self.done is None:
+            if self.remain is None:
                 ret += "   -.--"
             else:
-                if calcd_remain > (s.remain * 1.02): # effort overrun in red
+                if calcd_remain > (self.remain * 1.02): # effort overrun in red
                     ret += ANSI_RED
                     tail = ANSI_RESET
-                elif calcd_remain < (s.remain * 0.75): # effort underrun by 75% green
+                elif calcd_remain < (self.remain * 0.75): # effort underrun by 75% green
                     ret += ANSI_GREEN
                     tail = ANSI_RESET
-                ret += "% 7.2f" % s.remain
+                ret += "% 7.2f" % self.remain
         else:
             ret += "   Done"
         ret += "% 7.2f " % calcd_remain
         ret += tail
-        if len(s.children)>0 and s.done is not None:
+        if len(self.children)>0 and self.done is not None:
             ret += "*"
-        elif len(s.children)>0:
+        elif len(self.children)>0:
             ret += "+"
-        elif s.done is not None:
+        elif self.done is not None:
             ret += "X"
         else:
             ret += " "
@@ -546,55 +546,55 @@ class Task(object):
             ret = ANSI_BRIGHT + ret + ANSI_RESET
         return ret
 
-    def get_child(s, key):
+    def get_child(self, key):
         """ retrieve the child with the given key, or return None """
-        for c in s.children:
+        for c in self.children:
             if c.match_id(key):
                 return c
         # not found
         return None
 
-    def get_id(s):
+    def get_id(self):
         """ retrieve the (tidied?) ID of this task """
-        if isinstance(s.task_id, int):
-            return "#%03d" % s.task_id
+        if isinstance(self.task_id, int):
+            return "#%03d" % self.task_id
         else:
-            return s.task_id
+            return self.task_id
 
-    def get_path(s):
+    def get_path(self):
         """ return the absolute path of this task """
-        if s.parent == s:
+        if self.parent == self:
             return "/"
         else:
-            return s.parent.get_path() + str(s.task_id) + "/"
+            return self.parent.get_path() + str(self.task_id) + "/"
 
-    def integrity_check(s, recurse=True):
+    def integrity_check(self, recurse=True):
         """ re-write the list of children so that they have valid IDs. Recurse """
         msgs = []
-        childlist = copy(s.children)
-        del s.children[:]
+        childlist = copy(self.children)
+        del self.children[:]
         for c in childlist:
-            s.add_child(c)
+            self.add_child(c)
             if recurse:
                 msgs.extend( c.integrity_check( True ) )
         return msgs
 
-    def leaves( s ):
+    def leaves( self ):
         """ descend this task and show its leaf descendents """
-        if len([ x for x in s.children if x.done is None] ) == 0:
-            print s.format( TASK_TEXT_WIDTH, with_path=True )
+        if len([ x for x in self.children if x.done is None] ) == 0:
+            print self.format( TASK_TEXT_WIDTH, with_path=True )
         else:
-            for c in s.children:
+            for c in self.children:
                 if c.done is None:
                     c.leaves()
 
-    def ls( s, prefix="" ):
+    def ls( self, prefix="" ):
         """ show this task and its children if any """
         if prefix is "":
-            depth = s.print_lineage( s )
+            depth = self.print_lineage( self )
             print banner('-')
-        undones = [ c for c in s.children if c.done is None ]
-        dones =  [ c for c in s.children if c.done is not None ]
+        undones = [ c for c in self.children if c.done is None ]
+        dones =  [ c for c in self.children if c.done is not None ]
         for d in undones:
             print d.format(TASK_TEXT_WIDTH, highlight=True, prefix=prefix )
             if d.expanded:
@@ -604,51 +604,51 @@ class Task(object):
         if prefix is "":
             print banner()
 
-    def match_id(s, m):
+    def match_id(self, m):
         """ return whether the given id identifies this Task """
-        id = s.get_id()
+        id = self.get_id()
         return m[:len(id)].lower() == id.lower()
 
-    def print_lineage( s, highlight=None ):
-        if s.parent == s: # then I am root
+    def print_lineage( self, highlight=None ):
+        if self.parent == self: # then I am root
             print banner()
-            print ("%s td %s") % ( s.text, GIT_DESCRIPTION )
+            print self.text, GIT_DESCRIPTION
             return ""
         else:
-            dep = s.parent.print_lineage( highlight )
-            print dep + s.format(TASK_TEXT_WIDTH - len(dep), highlight==s )
+            dep = self.parent.print_lineage( highlight )
+            print dep + self.format(TASK_TEXT_WIDTH - len(dep), highlight==self )
             return "  " + dep
 
-    def rm(s, id):
+    def rm(self, id):
         """ remove the child identified by id """
-        s.children.remove( s.get_child(id) )
+        self.children.remove( self.get_child(id) )
 
-    def set_id(s,id):
+    def set_id(self,id):
         """ set the task's ID. This function is concerned with validating and
             formatting the ID, but not with making sure the parent's index is
             correct.  That has to be the parent's concern.
             """
         if isinstance(id, int):
-            s.task_id = "#%03d" % id
+            self.task_id = "#%03d" % id
         else:
             id = id.replace(" ","").replace("/","").lower()[:ID_WIDTH]
             if id.isdigit():
-                s.task_id = ("#%03d" % int(id) ) 
+                self.task_id = ("#%03d" % int(id) )
             else:
-                s.task_id = id
+                self.task_id = id
 
-    def set_remain(s, days):
+    def set_remain(self, days):
         """ set the estimated time remaining on this task 
             Argument is number or None"""
-        s.remain = days
+        self.remain = days
 
-    def set_text(s, text):
+    def set_text(self, text):
         """ set the text for the task """
-        s.text = text
+        self.text = text
 
-    def max_depth( s ):
+    def max_depth( self ):
         md = 1
-        for c in s.children:
+        for c in self.children:
             if c.done is None:
                 cmd = c.max_depth()
                 if md <= cmd:
@@ -1051,38 +1051,45 @@ def execute_command( command_line ):
     return success
 
 # First, tame the command line
-PICKLE_PATH="~"
-if os.environ.has_key('TD_PICKLE_PATH'):
-    PICKLE_PATH = os.environ['TD_PICKLE_PATH']
-PICKLE_FILE = os.path.expanduser( os.path.join( PICKLE_PATH, ".pytask.pickle") )
+# Search policy for .pytask.pickle:
+# If -f points to a file, use it
+# if -f points to a non-existent name under an existing directory, use it
+# elif -f points to a dir, create or use .pytask..pickle in that dir.
+# else
+#     search from current dir up to root
+#     if not found, use TD_PICKLE_PATH + .pytask.pickle
 if len(sys.argv) > 1 and sys.argv[1] == '-f':
     # Specify the pickle file
     sys.argv.pop(1)
-    file_name = sys.argv.pop(1)
-    if os.path.isfile( file_name ):
-        # if the provided string is a path to a file, use it
-        PICKLE_FILE = file_name
-    elif os.path.isfile( os.path.expanduser( os.path.join( PICKLE_PATH, file_name ) ) ):
-        # if the provided string is the name of a file present in the PICKLE-PATH, use it
-        PICKLE_FILE = os.path.expanduser( os.path.join( PICKLE_PATH, file_name ) )
-    elif os.path.isdir( file_name ):
-        # if the provided string is a dir, use the .pytask.pickle file in that dir
-        PICKLE_PATH = file_name
-        PICKLE_FILE = os.path.expanduser( os.path.join( PICKLE_PATH, ".pytask.pickle") )
-    elif os.path.isdir( os.path.dirname( file_name ) ):
-        # if the provided path is a non-existent file in an existing dir, use that path and file.
-        PICKLE_PATH = os.path.dirname( file_name )
-        PICKLE_FILE = os.path.expanduser( file_name )
-    elif os.path.basename( file_name ) == file_name:
-        # if the provided string is just a filename, then use that filename in the default location
-        PICKLE_FILE = os.path.expanduser( os.path.join( PICKLE_PATH, file_name) )
-    else:
-        # good luck! We leave the error reporting to the code that tries to open the file.
-        PICKLE_FILE = os.path.expanduser( os.path.join( PICKLE_PATH, ".pytask.pickle") )
+    cmd_line_fspec = os.path.abspath( os.path.expanduser( sys.argv.pop(1) ) )
+else:
+    cmd_line_fspec = '' # os.path.isdir('') returns False.
+
+if os.environ.has_key('TD_PICKLE_PATH'):
+    PICKLE_PATH = os.environ['TD_PICKLE_PATH']
+else:
+    PICKLE_PATH="~"
+
+# Fallback
+PICKLE_FILE = os.path.abspath( os.path.expanduser( os.path.join( PICKLE_PATH, ".pytask.pickle") ) )
+# Try to replace with one from current dir
+path = os.getcwd()
+# Possible override by command line
+if os.path.isdir( cmd_line_fspec ):
+    PICKLE_FILE = os.path.join( cmd_line_fspec, '.pytask.pickle' )
+elif cmd_line_fspec != '' and os.path.isdir( os.path.abspath( os.path.join( cmd_line_fspec, '..' ) ) ):
+    PICKLE_FILE = cmd_line_fspec
+else:
+    while path != '/':
+        candidate = os.path.join( path, '.pytask.pickle')
+        if os.path.isfile( candidate ):
+            PICKLE_FILE=candidate
+            break
+        path=os.path.abspath( path + '/..' )
 
 sys.stderr.write( "PICKLE_FILE = %s\n" % PICKLE_FILE )
 
-HISTORY_FILE = os.path.expanduser( PICKLE_PATH + "/.pytask.history" )
+HISTORY_FILE = os.path.expanduser( "~/.pytask.history" )
 
 # if we are not given a commandline, then go into interactive mode
 if len(sys.argv)==1:

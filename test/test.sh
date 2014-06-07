@@ -11,7 +11,7 @@ function test_td
 }
 
 ## test subject
-TD=../td
+TD=$(cd ..; pwd -L )/td
 
 
 ## Bootstrap Tests
@@ -58,4 +58,37 @@ else
   echo "FAIL."
 fi
 cat $TEMP_ERR 1>&2
+
+## Search for the picklefile in the current dir first
+echo -n "Test 4.1: "
+pushd test4/deeper >/dev/null
+$TD ls >$TEMP_OUT 2>$TEMP_ERR
+if fgrep -q "deeper item" $TEMP_OUT
+then
+  echo "Pass."
+else 
+  echo "FAIL."
+fi
+cat $TEMP_OUT
+popd >/dev/null
+ 
+
+## Search for the picklefile in the current dir first
+echo -n "Test 4.2: "
+pushd test4/deeper-empty >/dev/null
+$TD ls >$TEMP_OUT 2>$TEMP_ERR
+if fgrep -q "Item in test4 directory" $TEMP_OUT
+then
+  echo "Pass."
+else 
+  echo "FAIL."
+fi
+cat $TEMP_OUT
+popd >/dev/null
+ 
+
+# Tidy up
+### Remove (if present) the test's pickle file
+rm -f test.pickle
+find . -name .err.\*.tmp -delete -o -name .out.\*.tmp -delete
 
