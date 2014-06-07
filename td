@@ -242,7 +242,7 @@ class TaskDatabase(object):
 
     def __init__(self):
         """ Initialize a new TaskDatabase containing the root task. """
-        self.root=Task( self, "root", "/ Task List" )
+        self.root=Task( self, "todo", "/ Task List" )
         self.root.parent=self.root
         self.curdir=self.root
         # Dirstack is the stack of directories for pushd and popd.
@@ -612,7 +612,7 @@ class Task(object):
     def print_lineage( self, highlight=None ):
         if self.parent == self: # then I am root
             print banner()
-            print ("%s td %s") % ( self.text, GIT_DESCRIPTION )
+            print self.text, GIT_DESCRIPTION
             return ""
         else:
             dep = self.parent.print_lineage( highlight )
@@ -1051,38 +1051,45 @@ def execute_command( command_line ):
     return success
 
 # First, tame the command line
-PICKLE_PATH="~"
-if os.environ.has_key('TD_PICKLE_PATH'):
-    PICKLE_PATH = os.environ['TD_PICKLE_PATH']
-PICKLE_FILE = os.path.expanduser( os.path.join( PICKLE_PATH, ".pytask.pickle") )
+# Search policy for .pytask.pickle:
+# If -f points to a file, use it
+# if -f points to a non-existent name under an existing directory, use it
+# elif -f points to a dir, create or use .pytask..pickle in that dir.
+# else
+#     search from current dir up to root
+#     if not found, use TD_PICKLE_PATH + .pytask.pickle
 if len(sys.argv) > 1 and sys.argv[1] == '-f':
     # Specify the pickle file
     sys.argv.pop(1)
-    file_name = sys.argv.pop(1)
-    if os.path.isfile( file_name ):
-        # if the provided string is a path to a file, use it
-        PICKLE_FILE = file_name
-    elif os.path.isfile( os.path.expanduser( os.path.join( PICKLE_PATH, file_name ) ) ):
-        # if the provided string is the name of a file present in the PICKLE-PATH, use it
-        PICKLE_FILE = os.path.expanduser( os.path.join( PICKLE_PATH, file_name ) )
-    elif os.path.isdir( file_name ):
-        # if the provided string is a dir, use the .pytask.pickle file in that dir
-        PICKLE_PATH = file_name
-        PICKLE_FILE = os.path.expanduser( os.path.join( PICKLE_PATH, ".pytask.pickle") )
-    elif os.path.isdir( os.path.dirname( file_name ) ):
-        # if the provided path is a non-existent file in an existing dir, use that path and file.
-        PICKLE_PATH = os.path.dirname( file_name )
-        PICKLE_FILE = os.path.expanduser( file_name )
-    elif os.path.basename( file_name ) == file_name:
-        # if the provided string is just a filename, then use that filename in the default location
-        PICKLE_FILE = os.path.expanduser( os.path.join( PICKLE_PATH, file_name) )
-    else:
-        # good luck! We leave the error reporting to the code that tries to open the file.
-        PICKLE_FILE = os.path.expanduser( os.path.join( PICKLE_PATH, ".pytask.pickle") )
+    cmd_line_fspec = os.path.abspath( os.path.expanduser( sys.argv.pop(1) ) )
+else:
+    cmd_line_fspec = '' # os.path.isdir('') returns False.
+
+if os.environ.has_key('TD_PICKLE_PATH'):
+    PICKLE_PATH = os.environ['TD_PICKLE_PATH']
+else:
+    PICKLE_PATH="~"
+
+# Fallback
+PICKLE_FILE = os.path.abspath( os.path.expanduser( os.path.join( PICKLE_PATH, ".pytask.pickle") ) )
+# Try to replace with one from current dir
+path = os.getcwd()
+# Possible override by command line
+if os.path.isdir( cmd_line_fspec ):
+    PICKLE_FILE = os.path.join( cmd_line_fspec, '.pytask.pickle' )
+elif cmd_line_fspec != '' and os.path.isdir( os.path.abspath( os.path.join( cmd_line_fspec, '..' ) ) ):
+    PICKLE_FILE = cmd_line_fspec
+else:
+    while path != '/':
+        candidate = os.path.join( path, '.pytask.pickle')
+        if os.path.isfile( candidate ):
+            PICKLE_FILE=candidate
+            break
+        path=os.path.abspath( path + '/..' )
 
 sys.stderr.write( "PICKLE_FILE = %s\n" % PICKLE_FILE )
 
-HISTORY_FILE = os.path.expanduser( PICKLE_PATH + "/.pytask.history" )
+HISTORY_FILE = os.path.expanduser( "~/.pytask.history" )
 
 # if we are not given a commandline, then go into interactive mode
 if len(sys.argv)==1:
