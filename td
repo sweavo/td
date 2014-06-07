@@ -140,18 +140,10 @@ import time
 
 import working_hours
 
-if not os.environ.has_key( 'OSTYPE' ):
-    # in msys/windows we don't see OSTYPE, and it doesn't support ansi.
-    # coincidence? probably. Better way of detecting ANSI support? Probably.
-    ANSI_RED = ""
-    ANSI_GREEN = ""
-    ANSI_BRIGHT = ""
-    ANSI_RESET = ""
-else:
-    ANSI_RED = "\033[[31;1m"
-    ANSI_GREEN = "\033[[32;1m"
-    ANSI_BRIGHT = "\033[[1m"
-    ANSI_RESET = "\033[[0m"
+ANSI_RED = "\033[31;1m"
+ANSI_GREEN = "\033[32;1m"
+ANSI_BRIGHT = "\033[1m"
+ANSI_RESET = "\033[0m"
 
 VERBS={
     "add": ["TEXT"], 
@@ -232,7 +224,7 @@ def chomp_word( sentence ):
 def banner( ch=None):
     if ch is None:
         ch = "="
-    return ch * 80
+    return ANSI_GREEN + ( ch * 80 ) + ANSI_RESET
 
 def auto_complete( text, state ):
     """ state seems to want to increment until we return None """
