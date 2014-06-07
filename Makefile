@@ -26,5 +26,5 @@ backup:
 	./backup.sh
 
 describe:
-	echo $(GIT_DESCRIPTION)
+	@echo $(GIT_DESCRIPTION)
 
