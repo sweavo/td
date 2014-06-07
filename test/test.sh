@@ -5,8 +5,6 @@
 TEMP_ERR=.err.$$.tmp
 TEMP_OUT=.out.$$.tmp
 
-find . -name .err.\*.tmp -delete -o -name .out.\*.tmp -delete
-
 function test_td
 {
   $TD -f ./test.pickle "$@" 2>$TEMP_ERR >$TEMP_OUT
@@ -88,4 +86,9 @@ fi
 cat $TEMP_OUT
 popd >/dev/null
  
+
+# Tidy up
+### Remove (if present) the test's pickle file
+rm -f test.pickle
+find . -name .err.\*.tmp -delete -o -name .out.\*.tmp -delete
 
