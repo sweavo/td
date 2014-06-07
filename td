@@ -182,10 +182,6 @@ TASK_TEXT_WIDTH=63
 PROMPT=EXE_NAME+'> '
 ID_WIDTH=4
 
-CONTEXT="Default"
-if os.environ.has_key('TD_CONTEXT'):
-    CONTEXT = os.environ['TD_CONTEXT']
-
 DEFAULT_REMAIN=4.0
 
 # global_db is used for readline to be able to hook into the Todo list.
