@@ -127,8 +127,6 @@ Other Modes:
 GIT_DESCRIPTION="(development version)"
 
 from copy import copy
-import datetime
-import locale
 import os
 import pickle
 try:
@@ -199,8 +197,6 @@ def warn( s ):
 def error( s ):
     sys.stderr.write( "Error: %s\n" % s )
 
-def htmlify( a ):
-    return a.replace('<', '&lt;').replace('>', '&gt;')
 
 def pretty_time( seconds ):
     thresholds = [ ( 60, 'm'), ( 60, 'h' ), ( 24, 'd' ), ( 7, 'w' ) ]
