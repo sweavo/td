@@ -5,7 +5,7 @@ INST_DIR=/usr/local/bin
 
 PHONIES=default install report test
 
-GIT_DESCRIPTION=$(shell git describe --dirty='-modified')-$(shell git rev-parse --abbrev-ref HEAD)
+GIT_DESCRIPTION=$(shell git describe --long --tags --dirty='-modified')-$(shell git rev-parse --abbrev-ref HEAD)
 
 .PHONY: $(PHONIES)
 
