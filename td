@@ -658,15 +658,15 @@ class Task(object):
     def unexpand( self ):
         self.expanded = False
 
-    def zoom(s):
+    def zoom(self):
         """ descend recursively into the child with the most remaining time.
         """
-        if len(s.children) == 0:
-            return s
+        if len(self.children) == 0:
+            return self
         else:
-            min=s.calc_remain()
+            min=self.calc_remain()
             max=0.0
-            for c in s.children:
+            for c in self.children:
                 r = c.calc_remain()
                 if r > max:
                     result = c
@@ -674,7 +674,7 @@ class Task(object):
                 if r < min:
                     min = r
             if max == min:
-                return s
+                return self
             else:
                 return result.zoom()
 
