@@ -44,8 +44,12 @@ Adding / Editing Tasks:
         Move the task identified by SRCPATH to be a child of that identified by
         DSTPATH. NOTE: does not change the referenced task's ID. For that, use
         ren.
+
     mv SRCPATH DSTPATH:
         Synonym for move.
+
+    mmv SRCPATH ... DSTPATH
+        Move multiple items
 
     ren SRCPATH ID:
         set the ID on the task indicated by SRCPATH. NOTE: cannot move items,
@@ -91,7 +95,7 @@ Display:
         Print directory stack
 
     pwd:
-        Print current directory
+        Print current task
 
     show PATH:
         Print the full, unformatted text of the indicated Task.
@@ -101,9 +105,6 @@ Reports:
     dump:
         Dump entire database to stdout as a shell script
         (use on commandline, e.g. td dump > restore.sh )
-
-    tree PATH:
-        Show the task at PATH and all its descendents in a tree form (HTML)
 
 Other Modes:
     batch:
@@ -172,6 +173,7 @@ VERBS={
     "interactive": [],
     "ls": [],
     "mv": ["SRCPATH", "DSTPATH"],
+    "mmv": ["SRCPATHS", "DSTPATH"],
     "pds": [],
     "popd": [],
     "pushd": ["PATH"],
@@ -189,48 +191,6 @@ EXE_NAME="td"
 TASK_TEXT_WIDTH=57
 PROMPT=EXE_NAME+'> '
 ID_WIDTH=4
-
-HTML_DOC_HEAD="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>PyTask tree</title>
-<style>
-body
-{
-    font-size: small;
-}
-table {
-    width: 100%;
-    border-width: 1px;
-    border-spacing: 0px;
-    border-style: dotted;
-    border-color: gray;
-    border-collapse: collapse;
-}
-td {
-    border-width: 1px;
-    padding: 0px;
-    border-style: dotted;
-    border-color: gray;
-}
-pre
-{
-    margin: 0px;
-    padding: 0px;
-}
-</style>
-</head>
-<body bgcolor="white">
-<h1>PyTask (td) Tree</h1>
-<p>Generated """ + time.strftime( "%Y/%m/%d %H:%M:%S", time.localtime( ) ) + """</p>
-<table>
-"""
-
-HTML_DOC_FOOT="""</table>
-</body>
-</html>"""
 
 CONTEXT="Default"
 if os.environ.has_key('TD_CONTEXT'):
@@ -720,18 +680,6 @@ class Task(object):
         """ set the text for the task """
         s.text = text
 
-    def trs( s, width ):
-        """ return a list of lists of tds representing the tree below this node. """
-        title = htmlify( s.text )
-        if len( [ x for x in s.children if x.done is None ] ) > 0:
-            title = "<strong>%s</strong>" % title
-        yield [ '<td colspan="%s"><tt>%s</tt>(%s)<br/>%s</td>' % ( width, s.get_id(), s.calc_remain(), title ) ]
-        
-        for c in s.children:
-            if c.done is None:
-                for cr in c.trs( width - 1 ):
-                    yield [ '<td><pre>%s/</pre></td>' % ( s.get_id() ) ] + cr
-
     def max_depth( s ):
         md = 1
         for c in s.children:
@@ -1097,21 +1045,6 @@ def execute_command( command_line ):
         if db.swd(operand):
             db.pds()
             db.ls()
-
-    elif command == 'tree': # No command line==Display the tasks
-        tgt_path, operand = chomp_word( operand )
-        print HTML_DOC_HEAD
-        while tgt_path.strip() != "":
-            tgt = db.get( tgt_path )
-            if tgt is None:
-                sys.stderr.write( "Error: Invalid Path (%s)\n" % tgt_path )
-                success = False
-                break
-            else:
-                for tr in tgt.trs( tgt.max_depth() ):
-                    print "<tr>%s</tr>" % "".join( tr )
-            tgt_path, operand = chomp_word( operand )
-        print HTML_DOC_FOOT
 
     elif command == 'undone':
         cd_dot_dot = False
