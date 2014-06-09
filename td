@@ -1080,7 +1080,7 @@ if os.path.isdir( cmd_line_fspec ):
 elif cmd_line_fspec != '' and os.path.isdir( os.path.abspath( os.path.join( cmd_line_fspec, '..' ) ) ):
     PICKLE_FILE = cmd_line_fspec
 else:
-    while path != '/':
+    while path != os.path.abspath( '/' ):
         candidate = os.path.join( path, '.pytask.pickle')
         if os.path.isfile( candidate ):
             PICKLE_FILE=candidate
