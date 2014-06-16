@@ -548,6 +548,13 @@ class Task(object):
 
     def get_child(self, key):
         """ retrieve the child with the given key, or return None """
+        
+        if key == "@" and len( self.children ) > 0:
+            # commercial at means 'get first non-done'
+            for c in self.children:
+                if c.done is None:
+                    return c
+        
         for c in self.children:
             if c.match_id(key):
                 return c
@@ -1030,8 +1037,10 @@ def execute_command( command_line ):
             success = False
         else:
             tgt.unexpand()
+
     elif command == 'version':
         print GIT_DESCRIPTION
+
     elif command == 'zoom':
         tgt = db.get( operand )
         if tgt is None:
@@ -1107,6 +1116,9 @@ except:
 
 # then execute it
 execute_command( command_line )
+execute_command( 'show @' )
+
+
 try:
     readline.write_history_file( HISTORY_FILE )
 except:
