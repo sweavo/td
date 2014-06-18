@@ -23,7 +23,7 @@ Adding / Editing Tasks:
 
     by DATE PATH:
         set the deadline for a task
-        
+
     defer DATE PATH:
         set the start date of a task
 
@@ -77,14 +77,14 @@ Moving About:
         Switch directory with the top of the directory stack.
 
     zoom PATH:
-        Recursively navigate to the biggest child of the biggest child of the 
+        Recursively navigate to the biggest child of the biggest child of the
         identified task.
-        
+
 Display:
 
     leaves PATH:
         Show the todo items below the PATH that don't themselves have children
-        
+
     ls PATH:
         List the todo items in the current curdir
 
@@ -108,12 +108,12 @@ Reports:
 
 Other Modes:
     batch:
-        Useful for restoring dumps, read commands from stdin with no editing 
+        Useful for restoring dumps, read commands from stdin with no editing
         or readline capability.
 
     interactive:
         This is the default action if no verb is supplied. Enters interactive
-        mode where verbs and operands are taken from stdin with history and 
+        mode where verbs and operands are taken from stdin with history and
         GNU readline.
 
     help:
@@ -144,8 +144,8 @@ ANSI_BRIGHT = "\033[1m"
 ANSI_RESET = "\033[0m"
 
 VERBS={
-    "add": ["TEXT"], 
-    "adc": ["TEXT"], 
+    "add": ["TEXT"],
+    "adc": ["TEXT"],
     "batch": [],
     "boost": ["PATH"],
     "bump": ["PATH"],
@@ -178,7 +178,14 @@ VERBS={
 }
 
 EXE_NAME="td"
-TASK_TEXT_WIDTH=63
+
+if 'COLUMNS' in os.environ:
+    COLUMNS=int( os.environ['COLUMNS'] )
+else:
+    COLUMNS=80
+
+TASK_TEXT_WIDTH=COLUMNS - 18
+
 PROMPT=EXE_NAME+'> '
 ID_WIDTH=4
 
@@ -216,7 +223,7 @@ def chomp_word( sentence ):
 def banner( ch=None):
     if ch is None:
         ch = "="
-    return ANSI_GREEN + ( ch * 80 ) + ANSI_RESET
+    return ANSI_GREEN + ( ch * ( COLUMNS -1 ) ) + ANSI_RESET
 
 def auto_complete( text, state ):
     """ state seems to want to increment until we return None """
@@ -311,9 +318,9 @@ class TaskDatabase(object):
             self.cd( self.dirstack.pop().get_path() )
 
     def rotd(self, num=None):
-        """ pushd and unqueue current dir from BOTTOM of stack 
-        
-            num is the index from the top of the stack or negative num is 
+        """ pushd and unqueue current dir from BOTTOM of stack
+
+            num is the index from the top of the stack or negative num is
             from the top of the stack.
         """
         if isinstance(num,int):
@@ -392,7 +399,7 @@ class Task(object):
             t.set_id(id)
         else:
             t.set_id(t.get_id()) # force a validation of ID
-        
+
         orig_id=t.get_id() # the desired ID
         count = 0
         while self.get_child( t.get_id() ) is not None: # now disambiguate.
@@ -422,10 +429,10 @@ class Task(object):
             return self.deadline
 
     def calc_remain(self, override=True):
-        """ return the remain calculated recursively. 
-        
+        """ return the remain calculated recursively.
+
             override:   return the user-set remain if it's more than the
-                        calculated remain. Default True 
+                        calculated remain. Default True
         """
         if self.done is not None:
             return 0.0
@@ -512,7 +519,7 @@ class Task(object):
         task_text_width -= len( prefix )
 
         ret += ("%-" + str(task_text_width) + "s ") % self.text[:task_text_width]
-        
+
         if self.deadline is not None:
             ret += self.deadline.strftime( "%d/%m " ) + ("%03d " % working_hours.working_hours_till( self.deadline ) )
 
@@ -541,20 +548,20 @@ class Task(object):
             ret += "X"
         else:
             ret += " "
-        
+
         if highlight:
             ret = ANSI_BRIGHT + ret + ANSI_RESET
         return ret
 
     def get_child(self, key):
         """ retrieve the child with the given key, or return None """
-        
+
         if key == "@" and len( self.children ) > 0:
             # commercial at means 'get first non-done'
             for c in self.children:
                 if c.done is None:
                     return c
-        
+
         for c in self.children:
             if c.match_id(key):
                 return c
@@ -645,7 +652,7 @@ class Task(object):
                 self.task_id = id
 
     def set_remain(self, days):
-        """ set the estimated time remaining on this task 
+        """ set the estimated time remaining on this task
             Argument is number or None"""
         self.remain = days
 
@@ -697,10 +704,10 @@ def execute_command( command_line ):
 
     # Wa assume we have successfully executed the command unless we hear otherwise
     success = True
-    
+
     # break off the first word as our command
     command, operand = chomp_word( command_line )
-    
+
     # See whether we can/should read the database
     if command[0] == '#': # Special case: skip comments
         save = False
@@ -914,10 +921,10 @@ def execute_command( command_line ):
                 error ("Invalid Target Path")
                 success = False
             else:
-                print "from: %s" % src.get_path() 
+                print "from: %s" % src.get_path()
                 src.parent.rm( src.get_id() )
                 tgt.add_child( src )
-                print "to: %s" % src.get_path() 
+                print "to: %s" % src.get_path()
     elif command == 'mmv': # multi move
         srcs = []
         while success and len( operand.strip() ) > 0 :
@@ -944,11 +951,11 @@ def execute_command( command_line ):
                         success = False
                     else:
                         for src in srcs:
-                            src_path = src.get_path() 
+                            src_path = src.get_path()
                             src.parent.rm( src.get_id() )
                             tgt.add_child( src )
                             print "from: %s to %s." % ( src_path, src.get_path() )
-        
+
     elif command == 'pds':
         db.pds( operand )
 
@@ -981,8 +988,8 @@ def execute_command( command_line ):
         else:
             if days == "X":
                 tgt.set_remain( None )
-            else: 
-                try: 
+            else:
+                try:
                     tgt.set_remain( float( days ) )
                 except ValueError:
                     error( "Remain TIME should be float or X." )
