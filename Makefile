@@ -13,6 +13,7 @@ default:
 	@echo targets: $(PHONIES)
 
 install: 
+	cd colorama-0.3.1; python setup.py install
 	cp -v working_hours.py $(INST_DIR) 
 	sed 's/^GIT_DESCRIPTION=.*/GIT_DESCRIPTION="$(GIT_DESCRIPTION)"/' td >$(INST_DIR)/td
 

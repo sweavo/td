@@ -126,6 +126,7 @@ Other Modes:
 # All code must come after the docstring for __doc__ to work.
 GIT_DESCRIPTION="(development version)"
 
+import colorama
 from copy import copy
 import os
 import pickle
@@ -138,6 +139,7 @@ import time
 
 import working_hours
 
+colorama.init()
 ANSI_RED = "\033[31;1m"
 ANSI_GREEN = "\033[32;1m"
 ANSI_BRIGHT = "\033[1m"
