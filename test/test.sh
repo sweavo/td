@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-
+set -o pipefail
 
 # Test script for td
 TEMP_ERR=.err.$$.tmp
@@ -13,16 +13,16 @@ function test_td
 ## test subject
 TD=$(cd ..; pwd -L )/td
 
-
 ## Bootstrap Tests
 
 ### Check that -f works. If not, we mustn't continue as we might scrub user data
 echo -n "Test 1: " 
-if $TD -f ./minus-f-check.pickle "ls" 2>/dev/null | fgrep -q minus-f-check-ok
+if $TD -f ./minus-f-check.pickle "ls" | fgrep -q minus-f-check-ok
 then
 	echo "Pass."
 else
 	echo "FAIL. Stop."
+	echo "(Hint: if you don't have colorama installed, you sadly need to do that before running tests)"
 	exit 1
 fi
 
