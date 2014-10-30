@@ -229,7 +229,6 @@ def banner( ch=None):
 
 def auto_complete( text, state ):
     """ state seems to want to increment until we return None """
-    #print text,state
     verb, operand = chomp_word(text)
     if operand == "":
         count = 0
@@ -315,7 +314,7 @@ class TaskDatabase(object):
     def popd(self):
         """ pop directory from stack """
         if len(self.dirstack) == 0:
-            print "No more paths to pop."
+            error( "No more paths to pop." )
         else:
             self.cd( self.dirstack.pop().get_path() )
 
@@ -558,11 +557,14 @@ class Task(object):
     def get_child(self, key):
         """ retrieve the child with the given key, or return None """
 
-        if key == "@" and len( self.children ) > 0:
-            # commercial at means 'get first non-done'
-            for c in self.children:
-                if c.done is None:
-                    return c
+        if key == "@":
+            if len( self.children ) > 0:
+                # commercial at means 'get first non-done'
+                for c in self.children:
+                    if c.done is None:
+                        return c
+            # They must mean me if there are no (undone) children.
+            return self
 
         for c in self.children:
             if c.match_id(key):
@@ -716,7 +718,7 @@ def execute_command( command_line ):
         return True
 
     elif command == 'reset':
-        print "Info: cleared TODO database."
+        info( "cleared TODO database." )
         db=TaskDatabase()
 
     elif command == 'batch':
@@ -1005,7 +1007,7 @@ def execute_command( command_line ):
             error ("Invalid Path")
             success = False
         elif tgt2 is not None:
-            print "Destination ID '%s' already exists" % dstname
+            error( "Destination ID '%s' already exists" % dstname )
             success = False
         else:
             tgt.set_id( dstname )
