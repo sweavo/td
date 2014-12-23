@@ -1,4 +1,4 @@
-#!/usr/bin/python -tt
+#!/usr/bin/env python
 # ex: set tabstop=4 expandtab:
 #
 # $Id: working_hours.py 179 2013-05-29 22:52:54Z sweavo $
