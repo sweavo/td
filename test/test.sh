@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 set -o pipefail
+set -e
+set -u
 
 # Test script for td
 TEMP_ERR=.err.$$.tmp
