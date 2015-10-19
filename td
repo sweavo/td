@@ -111,6 +111,9 @@ Other Modes:
         Useful for restoring dumps, read commands from stdin with no editing
         or readline capability.
 
+    exit (also EOF, also ^D):
+        Quit interactive mode.
+
     interactive:
         This is the default action if no verb is supplied. Enters interactive
         mode where verbs and operands are taken from stdin with history and
@@ -665,6 +668,22 @@ class Task( object ):
                 return result.zoom( )
 
 
+def read_input( prompt ):
+    """ issue the prompt and read input, returning None if
+            * EOF
+            * ^D
+            * exit is typed
+    """
+    try:
+        l = raw_input( prompt )
+        if l == '\04':
+            return None
+        if l == 'exit':
+            return None
+    except EOFError:
+        return None
+    return l
+
 def execute_command( command_line ):
     """ one action upon the database. (which of course may be "interactive",
         in which case it loops and recurses on itself.
@@ -842,21 +861,11 @@ def execute_command( command_line ):
 
     elif command == 'interactive':
         execute_command( 'ls' )
-        try:
-            l = raw_input( PROMPT )
-            if l == '\04':
-                l = None
-        except EOFError:
-            l = None
+        l = read_input( PROMPT )
         while l is not None:
-            if l.strip( ) != '':
-                success = execute_command( l.strip( ) ) and success
-            try:
-                l = raw_input( PROMPT )
-                if l == '\04':
-                    l = None
-            except EOFError:
-                l = None
+            if l.strip() != '':
+                success = execute_command( l.strip() ) and success
+            l = read_input( PROMPT )
         print "<EOF>"
 
     elif command == 'leaves':  # No command line==Display the tasks
