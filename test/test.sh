@@ -40,8 +40,9 @@ there_were_failures=false
 ### check that td accepts command line in a single argv.
 echo -n "Test 2: "
 test_td "add this is my first test item" 
-read ID1 < $TEMP_OUT
-if [ "$ID1" == "this" ]
+cat $TEMP_OUT
+ID1=$(head -1 $TEMP_OUT)
+if [ "${ID1}" == "this" ]
 then
     echo "Pass."
 else
@@ -55,7 +56,7 @@ cat $TEMP_ERR 1>&2
 ### also check that td accepts multiple spaces between verb and operand.
 echo -n "Test 3: "
 test_td "add  this is my second test item"
-read ID2 < $TEMP_OUT
+ID2=$(head -1 $TEMP_OUT)
 if [ "$ID2" == "thi1" ]
 then
     echo "Pass."
