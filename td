@@ -1067,6 +1067,7 @@ def get_arguments( ):
     ap = argparse.ArgumentParser( )
     ap.add_argument( '--pickle-file', '-f', help='Specify the path of the picklefile or its containing dir.',
                      default='' )
+    ap.add_argument( '--verbose', '-v', action='store_true', help='Write some light diagnostic info to stderr' )
     ap.add_argument( 'text', nargs='*', help='command and arguments' )
     return ap.parse_args( )
 
@@ -1077,7 +1078,8 @@ if __name__ == "__main__":
         args.pickle_file = os.path.abspath( os.path.expanduser( args.pickle_file ) )
 
     PICKLE_FILE = find_config_file( args.pickle_file, os.environ.get( 'TD_PICKLE_PATH', '~' ) )
-    sys.stderr.write( "PICKLE_FILE = %s\n" % PICKLE_FILE )
+    if args.verbose:
+        sys.stderr.write( "PICKLE_FILE = %s\n" % PICKLE_FILE )
 
     HISTORY_FILE = os.path.expanduser( "~/.pytask.history" )
 
@@ -1103,5 +1105,4 @@ if __name__ == "__main__":
         readline.write_history_file( HISTORY_FILE )
     except:
         pass
-        # End of logic
 
