@@ -1082,7 +1082,7 @@ if __name__ == "__main__":
     HISTORY_FILE = os.path.expanduser( "~/.pytask.history" )
 
     # if we are not given a commandline, then go into interactive mode
-    if len( sys.argv ) == 1:
+    if len( args.text ) == 0:
         command_line = 'interactive'
     else:
         command_line = ' '.join( args.text )
