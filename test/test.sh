@@ -9,7 +9,7 @@ TEMP_OUT=.out.$$.tmp
 
 function test_td
 {
-  $TD -f ./test.pickle "$@" 2>$TEMP_ERR >$TEMP_OUT
+    $TD -f ./test.pickle "$@" 2>$TEMP_ERR >$TEMP_OUT
 }
 
 ## test subject
@@ -21,11 +21,11 @@ TD=$(cd ..; pwd -L )/td
 echo -n "Test 1: " 
 if $TD -f ./minus-f-check.pickle "ls" | fgrep -q minus-f-check-ok
 then
-	echo "Pass."
+    echo "Pass."
 else
-	echo "FAIL. Stop."
-	echo "(Hint: if you don't have colorama installed, you sadly need to do that before running tests)"
-	exit 1
+    echo "FAIL. Stop."
+    echo "(Hint: if you don't have colorama installed, you sadly need to do that before running tests)"
+    exit 1
 fi
 
 ### Remove (if present) the test's pickle file
@@ -41,10 +41,10 @@ test_td "add this is my first test item"
 read ID1 < $TEMP_OUT
 if [ "$ID1" == "this" ]
 then
-  echo "Pass."
+    echo "Pass."
 else
-  echo "$ID1"
-  echo "FAIL."
+    echo "$ID1"
+    echo "FAIL."
 fi
 cat $TEMP_ERR 1>&2
 
@@ -55,9 +55,9 @@ test_td "add  this is my second test item"
 read ID2 < $TEMP_OUT
 if [ "$ID2" == "thi1" ]
 then
-  echo "Pass."
+    echo "Pass."
 else
-  echo "FAIL."
+    echo "FAIL."
 fi
 cat $TEMP_ERR 1>&2
 
@@ -67,9 +67,9 @@ pushd test4/deeper >/dev/null
 $TD ls >$TEMP_OUT 2>$TEMP_ERR
 if fgrep -q "deeper item" $TEMP_OUT
 then
-  echo "Pass."
+    echo "Pass."
 else 
-  echo "FAIL."
+    echo "FAIL."
 fi
 cat $TEMP_OUT
 popd >/dev/null
@@ -81,13 +81,13 @@ pushd test4/deeper-empty >/dev/null
 $TD ls >$TEMP_OUT 2>$TEMP_ERR
 if fgrep -q "Item in test4 directory" $TEMP_OUT
 then
-  echo "Pass."
+    echo "Pass."
 else 
-  echo "FAIL."
+    echo "FAIL."
 fi
 cat $TEMP_OUT
 popd >/dev/null
- 
+
 
 # Tidy up
 ### Remove (if present) the test's pickle file
