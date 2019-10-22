@@ -32,6 +32,8 @@ fi
 rm -f test.pickle
 
 
+there_were_failures=false
+
 ## Can we add an item and does it return an ID?
 ### we do this on a non-existent picklefile to see that we don't get a warning
 ### on stdout.
@@ -45,6 +47,7 @@ then
 else
     echo "$ID1"
     echo "FAIL."
+    there_were_failures=true
 fi
 cat $TEMP_ERR 1>&2
 
@@ -58,6 +61,7 @@ then
     echo "Pass."
 else
     echo "FAIL."
+    there_were_failures=true
 fi
 cat $TEMP_ERR 1>&2
 
@@ -70,6 +74,7 @@ then
     echo "Pass."
 else 
     echo "FAIL."
+    there_were_failures=true
 fi
 cat $TEMP_OUT
 popd >/dev/null
@@ -84,6 +89,7 @@ then
     echo "Pass."
 else 
     echo "FAIL."
+    there_were_failures=true
 fi
 cat $TEMP_OUT
 popd >/dev/null
@@ -94,3 +100,12 @@ popd >/dev/null
 rm -f test.pickle
 find . -name .err.\*.tmp -delete -o -name .out.\*.tmp -delete
 
+
+# Report
+if $there_were_failures
+then
+    echo "There were FAILURES. Stop."
+    exit 1
+else
+    echo "Everything was OK."
+fi
