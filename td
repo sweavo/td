@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # ex: set tabstop=4 expandtab:
 #
-# $Id: td 180 2013-05-29 23:48:15Z sweavo $
-#
 """ Task list program.
 
 AVAILABLE VERBS:

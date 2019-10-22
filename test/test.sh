@@ -17,9 +17,9 @@ TD=$(cd ..; pwd -L )/td
 
 ## Bootstrap Tests
 
-### Check that -f works. If not, we mustn't continue as we might scrub user data
+### Check that -f works. If not, we mustn't continue as we might scrub user data.  We can't use fgrep -q or we'll find the pipe closed and td will throw.
 echo -n "Test 1: " 
-if $TD -f ./minus-f-check.pickle "ls" | fgrep -q minus-f-check-ok
+if $TD -f ./minus-f-check.pickle ls | fgrep minus-f-check-ok
 then
     echo "Pass."
 else
