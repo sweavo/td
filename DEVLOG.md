@@ -2,7 +2,10 @@
 
 resurrected td.  But it's written in python 2!
 
+* convert to python 3 _done_
+
 # BACKLOG
 
-* convert to python 3
+* Get it running (missing readline dependency?)
+
 
