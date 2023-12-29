@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # ex: set tabstop=4 expandtab:
 #
 """ Task list program.
@@ -280,7 +280,7 @@ class TaskDatabase( object ):
         things = map( Task.get_path,
                       [ self.curdir ] + [ x
                                           for x in reversed( self.dirstack ) ] )
-        print ', '.join( things )
+        print (', '.join( things ))
 
     def pushd( self, path ):
         """ push directory onto stack and change """
@@ -333,10 +333,10 @@ class TaskDatabase( object ):
             tgt.ls( )
 
     def dump( self ):
-        print "td batch <<EOF"
-        print "reset"
+        print ("td batch <<EOF")
+        print ("reset")
         self.root.dump( )
-        print "EOF"
+        print ("EOF")
 
 
 class Task( object ):
@@ -438,24 +438,24 @@ class Task( object ):
         INDENT = "  "
         if depth is None:
             depth = 0
-        print INDENT * depth + "# " + self.get_path( )
+        print (INDENT * depth + "# " + self.get_path( ))
         if self.get_path( ) == '/':
-            print "ed / " + self.text
+            print ("ed / " + self.text)
         else:
-            print INDENT * depth + "adc %s" % self.text
+            print (INDENT * depth + "adc %s" % self.text)
             depth = depth + 1
-            print INDENT * depth + "ren . %s" % self.get_id( )
+            print (INDENT * depth + "ren . %s" % self.get_id( ))
             if self.remain is not None:
-                print INDENT * depth + "remain %.2f" % self.remain
+                print (INDENT * depth + "remain %.2f" % self.remain)
         for c in self.children:
             c.dump( depth )
         if self.get_path( ) != '/':
             if self.done is not None:
-                print INDENT * depth + "done ."
+                print (INDENT * depth + "done .")
             else:
-                print INDENT * depth + "cd .."
+                print (INDENT * depth + "cd ..")
             depth -= 1
-            print INDENT * depth + "# End of %s. " % self.get_path( )
+            print (INDENT * depth + "# End of %s. " % self.get_path( ))
 
     def expand( self ):
         self.expanded = True
@@ -569,7 +569,7 @@ class Task( object ):
     def leaves( self ):
         """ descend this task and show its leaf descendents """
         if len( [ x for x in self.children if x.done is None ] ) == 0:
-            print self.format( TASK_TEXT_WIDTH, with_path=True )
+            print( self.format( TASK_TEXT_WIDTH, with_path=True ))
         else:
             for c in self.children:
                 if c.done is None:
@@ -577,19 +577,19 @@ class Task( object ):
 
     def ls( self, prefix="" ):
         """ show this task and its children if any """
-        if prefix is "":
+        if prefix == "":
             depth = self.print_lineage( self )
-            print banner( '-' )
+            print (banner( '-' ))
         undones = [ c for c in self.children if c.done is None ]
         dones = [ c for c in self.children if c.done is not None ]
         for d in undones:
-            print d.format( TASK_TEXT_WIDTH, highlight=True, prefix=prefix )
+            print( d.format( TASK_TEXT_WIDTH, highlight=True, prefix=prefix ))
             if d.expanded:
                 d.ls( prefix + '    /' )
         for d in dones:
-            print d.format( TASK_TEXT_WIDTH, highlight=False, prefix=prefix )
-        if prefix is "":
-            print banner( )
+            print( d.format( TASK_TEXT_WIDTH, highlight=False, prefix=prefix ))
+        if prefix == "":
+            print( banner( ))
 
     def match_id( self, m ):
         """ return whether the given id identifies this Task """
@@ -598,12 +598,12 @@ class Task( object ):
 
     def print_lineage( self, highlight=None ):
         if self.parent == self:  # then I am root
-            print banner( )
-            print self.text, GIT_DESCRIPTION
+            print (banner( ))
+            print( self.text, GIT_DESCRIPTION)
             return ""
         else:
             dep = self.parent.print_lineage( highlight )
-            print dep + self.format( TASK_TEXT_WIDTH - len( dep ), highlight == self )
+            print( dep + self.format( TASK_TEXT_WIDTH - len( dep ), highlight == self ))
             return "  " + dep
 
     def rm( self, id ):
@@ -724,10 +724,10 @@ def execute_command( command_line ):
 
     # Interpret the command
     if command == 'help':
-        print __doc__
+        print (__doc__)
 
     elif command == 'add':  # Add a task in the current curdir
-        print db.add( operand ).task_id
+        print( db.add( operand ).task_id)
 
     elif command == 'adc':  # Add task and change to it.
         db.cd( db.add( operand ).get_path( ) )
@@ -740,7 +740,7 @@ def execute_command( command_line ):
                     success = False
                     break
             l = sys.stdin.readline( )
-        print "<EOF>"
+        print ("<EOF>")
 
     elif command == 'boost':
         success = True
@@ -788,7 +788,7 @@ def execute_command( command_line ):
         db.cd( operand )
 
     elif command == 'clear':
-        print '\x1b[H\x1b[2J'
+        print( '\x1b[H\x1b[2J')
 
     elif command == 'defer':
         date_text, path = chomp_word( operand )
@@ -854,8 +854,8 @@ def execute_command( command_line ):
     elif command == 'ic':
         log = db.root.integrity_check( )
         for l in log:
-            print l
-        print "check complete."
+            print (l)
+        print( "check complete.")
 
     elif command == 'interactive':
         execute_command( 'ls' )
@@ -864,7 +864,7 @@ def execute_command( command_line ):
             if l.strip() != '':
                 success = execute_command( l.strip() ) and success
             l = read_input( PROMPT )
-        print "<EOF>"
+        print ("<EOF>")
 
     elif command == 'leaves':  # No command line==Display the tasks
         tgt = db.get( operand )
@@ -898,10 +898,10 @@ def execute_command( command_line ):
                 error( "Invalid Target Path" )
                 success = False
             else:
-                print "from: %s" % src.get_path( )
+                print ("from: %s" % src.get_path( ))
                 src.parent.rm( src.get_id( ) )
                 tgt.add_child( src )
-                print "to: %s" % src.get_path( )
+                print( "to: %s" % src.get_path( ))
     elif command == 'mmv':  # multi move
         srcs = [ ]
         while success and len( operand.strip( ) ) > 0:
@@ -931,7 +931,7 @@ def execute_command( command_line ):
                             src_path = src.get_path( )
                             src.parent.rm( src.get_id( ) )
                             tgt.add_child( src )
-                            print "from: %s to %s." % ( src_path, src.get_path( ) )
+                            print( "from: %s to %s." % ( src_path, src.get_path( ) ))
 
     elif command == 'pds':
         db.pds( )
@@ -950,7 +950,7 @@ def execute_command( command_line ):
         db.pds( )
 
     elif command == 'pwd':
-        print db.curdir.get_path( )
+        print (db.curdir.get_path( ))
 
     elif command == 'reset':  # We've already done the action but don't want to land in the else:
         pass
@@ -994,7 +994,7 @@ def execute_command( command_line ):
             error( "Invalid Path" )
             success = False
         else:
-            print tgt.text
+            print( tgt.text)
 
     elif command == 'swd':
         if db.swd( operand ):
@@ -1020,7 +1020,7 @@ def execute_command( command_line ):
             tgt.unexpand( )
 
     elif command == 'version':
-        print GIT_DESCRIPTION
+        print (GIT_DESCRIPTION)
 
     elif command == 'zoom':
         tgt = db.get( operand )
