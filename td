@@ -673,7 +673,7 @@ def read_input( prompt ):
             * exit is typed
     """
     try:
-        l = raw_input( prompt )
+        l = input( prompt )
         if l == '\04':
             return None
         if l == 'exit':
