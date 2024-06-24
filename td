@@ -1091,8 +1091,8 @@ if __name__ == "__main__":
 
     # Set up readline in case we need it
     try:
-        #readline.set_completer( auto_complete )
-        #readline.parse_and_bind( "tab: complete" )
+        # readline.set_completer( auto_complete )
+        # readline.parse_and_bind( "tab: complete" )
         readline.read_history_file( HISTORY_FILE )
     except:
         pass
