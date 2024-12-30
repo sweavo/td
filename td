@@ -131,6 +131,7 @@ import colorama
 from copy import copy
 import os
 import pickle
+import yaml
 import argparse
 
 try:
@@ -1034,9 +1035,10 @@ def execute_command( command_line ):
         error( "unknown verb %s." % command )
         success = False
     if save:
-        f = open( PICKLE_FILE, "wb" )
-        pickle.dump( db, f )
-        f.close( )
+        with open( PICKLE_FILE, "wb" ) as fp:
+            pickle.dump( db, fp )
+        with open( f"{PICKLE_FILE}.yml", "w") as fp:
+             yaml.safe_dump(db,fp)
 
     return success
 
