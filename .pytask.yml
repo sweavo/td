@@ -1,0 +1,82 @@
+!!python/object:__main__.TaskDatabase
+curdir: &id002 !!python/object:__main__.Task
+  children:
+  - &id001 !!python/object:__main__.Task
+    children:
+    - !!python/object:__main__.Task
+      children: []
+      created: 1404652839.289568
+      deadline: null
+      defer: null
+      done: 1703922318.1755526
+      due: null
+      expanded: false
+      parent: *id001
+      prio: 1
+      remain: null
+      task_id: conf
+      text: config file (key=value) with -c switch
+    - !!python/object:__main__.Task
+      children: []
+      created: 1404652839.311716
+      deadline: null
+      defer: null
+      done: null
+      due: null
+      expanded: false
+      parent: *id001
+      prio: 1
+      remain: null
+      task_id: allo
+      text: allow ansi on or off in config file
+    - !!python/object:__main__.Task
+      children: []
+      created: 1404652839.297111
+      deadline: null
+      defer: null
+      done: null
+      due: null
+      expanded: false
+      parent: *id001
+      prio: 1
+      remain: null
+      task_id: con1
+      text: config can switch off columns like remain
+    created: 1404652839.305471
+    deadline: null
+    defer: null
+    done: null
+    due: null
+    expanded: false
+    parent: *id002
+    prio: 1
+    remain: null
+    task_id: user
+    text: user config file (user and host based)
+  - !!python/object:__main__.Task
+    children: []
+    created: 1571776563.186
+    deadline: null
+    defer: null
+    done: null
+    due: null
+    expanded: false
+    parent: *id002
+    prio: 1
+    remain: null
+    task_id: allo
+    text: allow hide and show done items as well as expunge.
+  created: 1404652838.954051
+  deadline: null
+  defer: null
+  done: null
+  due: null
+  expanded: false
+  parent: *id002
+  prio: 1
+  remain: null
+  task_id: todo
+  text: todo
+dirstack: []
+path: []
+root: *id002
