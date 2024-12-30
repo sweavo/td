@@ -9,7 +9,7 @@ TEMP_OUT=.out.$$.tmp
 
 function test_td
 {
-    $TD -f ./test.pickle "$@" 2>$TEMP_ERR >$TEMP_OUT
+    $TD -f ./test.yml "$@" 2>$TEMP_ERR >$TEMP_OUT
 }
 
 ## test subject
@@ -18,8 +18,8 @@ TD=$(cd ..; pwd -L )/td
 ## Bootstrap Tests
 
 ### Check that -f works. If not, we mustn't continue as we might scrub user data.  We can't use fgrep -q or we'll find the pipe closed and td will throw.
-echo -n "Test 1: " 
-if $TD -f ./minus-f-check.pickle ls | fgrep minus-f-check-ok
+echo -n "Test 1: "
+if $TD -f ./minus-f-check.yml ls | fgrep minus-f-check-ok
 then
     echo "Pass."
 else
@@ -28,18 +28,18 @@ else
     exit 1
 fi
 
-### Remove (if present) the test's pickle file
-rm -f test.pickle
+### Remove (if present) the test's yml file
+rm -f test.yml
 
 
 there_were_failures=false
 
 ## Can we add an item and does it return an ID?
-### we do this on a non-existent picklefile to see that we don't get a warning
+### we do this on a non-existent yml to see that we don't get a warning
 ### on stdout.
 ### check that td accepts command line in a single argv.
 echo -n "Test 2: "
-test_td "add this is my first test item" 
+test_td "add this is my first test item"
 cat $TEMP_OUT
 ID1=$(head -1 $TEMP_OUT)
 if [ "${ID1}" == "this" ]
@@ -66,29 +66,29 @@ else
 fi
 cat $TEMP_ERR 1>&2
 
-## Search for the picklefile in the current dir first
+## Search for the yml in the current dir first
 echo -n "Test 4.1: "
 pushd test4/deeper >/dev/null
 $TD ls >$TEMP_OUT 2>$TEMP_ERR
 if fgrep -q "deeper item" $TEMP_OUT
 then
     echo "Pass."
-else 
+else
     echo "FAIL."
     there_were_failures=true
 fi
 cat $TEMP_OUT
 popd >/dev/null
- 
 
-## Search for the picklefile in the current dir first
+
+## Search for the yml in the current dir first
 echo -n "Test 4.2: "
 pushd test4/deeper-empty >/dev/null
 $TD ls >$TEMP_OUT 2>$TEMP_ERR
 if fgrep -q "Item in test4 directory" $TEMP_OUT
 then
     echo "Pass."
-else 
+else
     echo "FAIL."
     there_were_failures=true
 fi
@@ -97,8 +97,8 @@ popd >/dev/null
 
 
 # Tidy up
-### Remove (if present) the test's pickle file
-rm -f test.pickle
+### Remove (if present) the test's yml file
+rm -f test.yml
 find . -name .err.\*.tmp -delete -o -name .out.\*.tmp -delete
 
 
