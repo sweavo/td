@@ -3,7 +3,7 @@ curdir: &id001 !!python/object:__main__.Task
   children:
   - !!python/object:__main__.Task
     children: []
-    created: 1402061088.819207
+    created: 1735579349.494863
     deadline: null
     defer: null
     done: null
@@ -14,17 +14,17 @@ curdir: &id001 !!python/object:__main__.Task
     remain: null
     task_id: minu
     text: minus-f-check-ok
-  created: 1401288613.418884
+  created: 1735579182.966474
   deadline: null
   defer: null
-  done: 1402061070.031197
+  done: null
   due: null
   expanded: false
   parent: *id001
   prio: 1
   remain: null
-  task_id: '#000'
-  text: '0'
+  task_id: todo
+  text: todo
 dirstack: []
 path: []
 root: *id001

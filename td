@@ -130,7 +130,6 @@ GIT_DESCRIPTION = "(development version)"
 import colorama
 from copy import copy
 import os
-import pickle
 import yaml
 import argparse
 
@@ -715,12 +714,11 @@ def execute_command( command_line ):
 
     else:
         try:
-            f = open( PICKLE_FILE, "rb" )
-            db = pickle.load( f )
-            global_db = db
-            f.close( )
+            with open( PYTASK_FILE, "r" ) as fp:
+                db = yaml.load( fp, yaml.Loader )
+                global_db = db
         except:
-            warn( "could not load %s." % PICKLE_FILE )
+            warn( "could not load %s." % PYTASK_FILE )
             db = TaskDatabase( )
 
     # Interpret the command
@@ -1035,10 +1033,8 @@ def execute_command( command_line ):
         error( "unknown verb %s." % command )
         success = False
     if save:
-        with open( PICKLE_FILE, "wb" ) as fp:
-            pickle.dump( db, fp )
-        with open( f"{PICKLE_FILE}.yml", "w") as fp:
-             yaml.safe_dump(db,fp)
+        with open( PYTASK_FILE, "w") as fp:
+             yaml.dump(db,fp)
 
     return success
 
@@ -1046,28 +1042,28 @@ def execute_command( command_line ):
 def find_config_file( requested_path, default_path ):
     """ If requested_path indicates a file, use it.
         elif requested_path is a non-existent name under an existing directory, create and use that
-        elif requested_path is a directory, create or use .pytask.pickle in that dir
+        elif requested_path is a directory, create or use .pytask.yml in that dir
         else
             search from current dir up to root
             if not found, use default_path
     """
     if os.path.isdir( requested_path ):
-        return os.path.join( requested_path, '.pytask.pickle' )
+        return os.path.join( requested_path, '.pytask.yml' )
     elif requested_path != '' and os.path.isdir( os.path.abspath( os.path.join( requested_path, '..' ) ) ):
         return requested_path
     else:
         path = os.getcwd( )
         while path != os.path.abspath( '/' ):
-            candidate = os.path.join( path, '.pytask.pickle' )
+            candidate = os.path.join( path, '.pytask.yml' )
             if os.path.isfile( candidate ):
                 return candidate
             path = os.path.abspath( path + '/..' )
-        return os.path.abspath( os.path.expanduser( os.path.join( default_path, ".pytask.pickle" ) ) )
+        return os.path.abspath( os.path.expanduser( os.path.join( default_path, ".pytask.yml" ) ) )
 
 
 def get_arguments( ):
     ap = argparse.ArgumentParser( )
-    ap.add_argument( '--pickle-file', '-f', help='Specify the path of the picklefile or its containing dir.',
+    ap.add_argument( '--file', '-f', help='Specify the path of the data file or its containing dir.',
                      default='' )
     ap.add_argument( '--verbose', '-v', action='store_true', help='Write some light diagnostic info to stderr' )
     ap.add_argument( 'text', nargs='*', help='command and arguments' )
@@ -1076,12 +1072,12 @@ def get_arguments( ):
 
 if __name__ == "__main__":
     args = get_arguments( )
-    if args.pickle_file != '':
-        args.pickle_file = os.path.abspath( os.path.expanduser( args.pickle_file ) )
+    if args.file != '':
+        args.file = os.path.abspath( os.path.expanduser( args.file ) )
 
-    PICKLE_FILE = find_config_file( args.pickle_file, os.environ.get( 'TD_PICKLE_PATH', '~' ) )
+    PYTASK_FILE = find_config_file( args.file, os.environ.get( 'PYTASK_PATH', '~' ) )
     if args.verbose:
-        sys.stderr.write( "PICKLE_FILE = %s\n" % PICKLE_FILE )
+        sys.stderr.write( "PYTASK_FILE = %s\n" % PYTASK_FILE )
 
     HISTORY_FILE = os.path.expanduser( "~/.pytask.history" )
 
