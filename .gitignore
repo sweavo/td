@@ -2,4 +2,4 @@
 workspace.xml
 *.history
 .pytask.pickle
-
+.venv
